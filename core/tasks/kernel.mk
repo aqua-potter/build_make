@@ -70,6 +70,8 @@
 #                                          modules in root instead of system
 
 
+ifneq ($(TARGET_NO_KERNEL),true)
+
 TARGET_AUTO_KDIR := $(shell echo $(TARGET_DEVICE_DIR) | sed -e 's/^device/kernel/g')
 
 ## Externally influenced variables
@@ -403,3 +405,20 @@ $(file) : $(KERNEL_BIN) | $(ACP)
 
 ALL_PREBUILT += $(INSTALLED_KERNEL_TARGET)
 endif
+
+ifeq ($(TARGET_NEEDS_DTBOIMAGE),true)
+file := $(INSTALLED_DTBOIMAGE_TARGET)
+ALL_PREBUILT += $(file)
+$(file) : $(TARGET_PREBUILT_DTBO) | $(ACP)
+	$(transform-prebuilt-to-target)
+
+ALL_PREBUILT += $(INSTALLED_DTBOIMAGE_TARGET)
+endif
+
+.PHONY: kernel
+kernel: $(INSTALLED_KERNEL_TARGET)
+
+.PHONY: dtbo
+dtbo: $(INSTALLED_DTBOIMAGE_TARGET)
+
+endif # TARGET_NO_KERNEL
